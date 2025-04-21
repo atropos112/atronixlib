@@ -3,12 +3,12 @@
 
   outputs = {
     self,
-    lib,
     nixpkgs,
   }: let
     pkgs = import nixpkgs {
       inherit (self) system;
     };
+	lib = pkgs.lib;
   in {
     lib = {
       # writeShellScript here is to
