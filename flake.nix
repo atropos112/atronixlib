@@ -31,6 +31,10 @@
         EOF
         echo
       ''}";
+
+      goTestScript = self.lib.writeShellScript "test" ''
+        go test ./... -race -coverprofile=coverage.out -covermode=atomic
+      '';
     };
   };
 }
