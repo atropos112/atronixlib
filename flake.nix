@@ -6,9 +6,9 @@
     nixpkgs,
   }: let
     pkgs = import nixpkgs {
-      inherit (self) system;
+      system = "x86_64-linux";
     };
-	lib = pkgs.lib;
+    lib = pkgs.lib;
   in {
     lib = {
       # writeShellScript here is to
