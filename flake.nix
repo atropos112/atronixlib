@@ -14,13 +14,13 @@
       # writeShellScript here is to
       # - Add same setup to all scripts
       # - Cause treesitter to format bash scripts correctly
-      writeShellScript = name: script: ''
+      writeShellScript = name: script: "${pkgs.writeShellScript name ''
         set -xeuo pipefail
         ORIGINAL_DIR=$(pwd)
         cd $DEVENV_ROOT
         ${script}
         cd $ORIGINAL_DIR
-      '';
+      ''}";
 
       listScripts = scripts: "${pkgs.writeShellScript "help" ''
         echo
