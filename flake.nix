@@ -22,7 +22,7 @@
         cd $ORIGINAL_DIR
       '';
 
-      helpScript = scripts: "${pkgs.writeShellScript "help" ''
+      list-scripts = scripts: "${pkgs.writeShellScript "help" ''
         echo
         echo 🦾 Useful project scripts:
         echo 🦾
@@ -32,9 +32,46 @@
         echo
       ''}";
 
-      goTestScript = self.lib.writeShellScript "test" ''
+      goTest = self.lib.writeShellScript "test" ''
         go test ./... -race -coverprofile=coverage.out -covermode=atomic
       '';
+
+      run-mkdocs = {mkdocsPath ? "./mkdocs.yml"}:
+        self.lib.writeShellScript "run-mkdocs" ''
+          mkdocs serve --dev-addr 0.0.0.0:8000 --config-file ${mkdocsPath}
+        '';
+
+      build-mkdocs = {mkdocsPath ? "./mkdocs.yml"}:
+        self.lib.writeShellScript "build-mkdocs" ''
+          mkdocs build --strict --config-file ${mkdocsPath}
+        '';
+
+      # INFO: These are convinience wrappers for the functions above for devenv only purposes.
+      devenv = {
+        pre-commit.hooks = {
+          gitleaks = {
+            enable = true;
+            name = "gitleaks";
+            entry = self.lib.writeShellScript "gitleaks" "gitleaks protect --verbose --redact --staged";
+          };
+        };
+        scripts = {
+          help = scripts: {
+            exec = self.lib.list-scripts scripts;
+            description = "Show this help message";
+          };
+
+          run-docs = {mkdocsPath ? "./mkdocs.yml"}: {
+            exec = self.lib.run-mkdocs {mkdocsPath = mkdocsPath;};
+            description = "Run mkdocs server";
+          };
+
+          build-docs = {mkdocsPath ? "./mkdocs.yml"}: {
+            exec = self.lib.build-mkdocs {mkdocsPath = mkdocsPath;};
+            description = "Build mkdocs site";
+          };
+        };
+      };
     };
   };
 }
