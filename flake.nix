@@ -52,7 +52,7 @@
           gitleaks = {
             enable = true;
             name = "gitleaks";
-            entry = self.lib.writeShellScript "gitleaks" "gitleaks protect --verbose --redact --staged";
+            entry = self.lib.writeShellScript "gitleaks" "${pkgs.gitleaks}/bin/gitleaks protect --verbose --redact --staged";
           };
 
           markdownlint = {
