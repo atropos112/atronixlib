@@ -22,7 +22,7 @@
         cd $ORIGINAL_DIR
       '';
 
-      list-scripts = scripts: "${pkgs.writeShellScript "help" ''
+      listScripts = scripts: "${pkgs.writeShellScript "help" ''
         echo
         echo 🦾 Useful project scripts:
         echo 🦾
@@ -36,38 +36,53 @@
         go test ./... -race -coverprofile=coverage.out -covermode=atomic
       '';
 
-      run-mkdocs = {mkdocsPath ? "./mkdocs.yml"}:
+      runMkdocs = {mkdocsPath ? "./mkdocs.yml"}:
         self.lib.writeShellScript "run-mkdocs" ''
           mkdocs serve --dev-addr 0.0.0.0:8000 --config-file ${mkdocsPath}
         '';
 
-      build-mkdocs = {mkdocsPath ? "./mkdocs.yml"}:
+      buildMkdocs = {mkdocsPath ? "./mkdocs.yml"}:
         self.lib.writeShellScript "build-mkdocs" ''
           mkdocs build --strict --config-file ${mkdocsPath}
         '';
 
       # INFO: These are convinience wrappers for the functions above for devenv only purposes.
       devenv = {
-        pre-commit.hooks = {
+        git-hooks.hooks = {
           gitleaks = {
             enable = true;
             name = "gitleaks";
             entry = self.lib.writeShellScript "gitleaks" "gitleaks protect --verbose --redact --staged";
           };
+          markdownlint = {
+            enable = true;
+            settings.configuration = {
+              MD045 = false; # no-alt-line
+              MD033 = {
+                allowed_elements = [
+                  "p"
+                  "img"
+                ];
+              };
+              MD013 = {
+                line_length = 360;
+              };
+            };
+          };
         };
         scripts = {
           help = scripts: {
-            exec = self.lib.list-scripts scripts;
+            exec = self.lib.listScripts scripts;
             description = "Show this help message";
           };
 
-          run-docs = {mkdocsPath ? "./mkdocs.yml"}: {
-            exec = self.lib.run-mkdocs {mkdocsPath = mkdocsPath;};
+          runDocs = {mkdocsPath ? "./mkdocs.yml"}: {
+            exec = self.lib.runMkdocs {mkdocsPath = mkdocsPath;};
             description = "Run mkdocs server";
           };
 
-          build-docs = {mkdocsPath ? "./mkdocs.yml"}: {
-            exec = self.lib.build-mkdocs {mkdocsPath = mkdocsPath;};
+          buildDocs = {mkdocsPath ? "./mkdocs.yml"}: {
+            exec = self.lib.buildMkdocs {mkdocsPath = mkdocsPath;};
             description = "Build mkdocs site";
           };
         };
