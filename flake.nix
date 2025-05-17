@@ -36,13 +36,13 @@
         go test ./... -race -coverprofile=coverage.out -covermode=atomic
       '';
 
-      runMkdocs = {mkDocsDir ? "."}:
+      runMkdocs = mkDocsDir:
         self.lib.writeShellScript "run-mkdocs" ''
           cd ${mkDocsDir}
           ${pkgs.uv}/bin/uv run mkdocs serve --dev-addr 0.0.0.0:8000
         '';
 
-      buildMkdocs = {mkDocsDir ? "."}:
+      buildMkdocs = mkDocsDir:
         self.lib.writeShellScript "build-mkdocs" ''
           cd ${mkDocsDir}
           ${pkgs.uv}/bin/uv run mkdocs build --strict
@@ -79,13 +79,13 @@
             description = "Show this help message";
           };
 
-          runDocs = {mkDocsDir ? "."}: {
-            exec = self.lib.runMkdocs {inherit mkDocsDir;};
+          runDocs = mkDocsDir: {
+            exec = self.lib.runMkdocs mkDocsDir;
             description = "Run mkdocs server";
           };
 
-          buildDocs = {mkDocsDir ? "."}: {
-            exec = self.lib.buildMkdocs {inherit mkDocsDir;};
+          buildDocs = mkDocsDir: {
+            exec = self.lib.buildMkdocs mkDocsDir;
             description = "Build mkdocs site";
           };
         };
