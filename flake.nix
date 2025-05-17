@@ -32,8 +32,12 @@
         echo
       ''}";
 
-      goTest = self.lib.writeShellScript "test" ''
+      goTest = self.lib.writeShellScript "go-test" ''
         go test ./... -race -coverprofile=coverage.out -covermode=atomic
+      '';
+
+      pyTest = self.lib.writeShellScript "py-test" ''
+        pytest --cov=./ --cov-report=xml --cache-clear --new-first --failed-first --verbose
       '';
 
       runMkdocs = mkDocsDir:
