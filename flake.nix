@@ -36,14 +36,16 @@
         go test ./... -race -coverprofile=coverage.out -covermode=atomic
       '';
 
-      runMkdocs = {mkdocsPath ? "./mkdocs.yml"}:
+      runMkdocs = {mkDocsDir ? "."}:
         self.lib.writeShellScript "run-mkdocs" ''
-          mkdocs serve --dev-addr 0.0.0.0:8000 --config-file ${mkdocsPath}
+          cd ${mkDocsDir}
+          ${pkgs.uv}/bin/uv run mkdocs serve --dev-addr 0.0.0.0:8000
         '';
 
-      buildMkdocs = {mkdocsPath ? "./mkdocs.yml"}:
+      buildMkdocs = {mkDocsDir ? "."}:
         self.lib.writeShellScript "build-mkdocs" ''
-          mkdocs build --strict --config-file ${mkdocsPath}
+          cd ${mkDocsDir}
+          ${pkgs.uv}/bin/uv run mkdocs build --strict
         '';
 
       # INFO: These are convinience wrappers for the functions above for devenv only purposes.
@@ -77,13 +79,13 @@
             description = "Show this help message";
           };
 
-          runDocs = {mkdocsPath ? "./mkdocs.yml"}: {
-            exec = self.lib.runMkdocs {mkdocsPath = mkdocsPath;};
+          runDocs = {mkDocsDir ? "."}: {
+            exec = self.lib.runMkdocs {inherit mkDocsDir;};
             description = "Run mkdocs server";
           };
 
-          buildDocs = {mkdocsPath ? "./mkdocs.yml"}: {
-            exec = self.lib.buildMkdocs {mkdocsPath = mkdocsPath;};
+          buildDocs = {mkDocsDir ? "."}: {
+            exec = self.lib.buildMkdocs {inherit mkDocsDir;};
             description = "Build mkdocs site";
           };
         };
