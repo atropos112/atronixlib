@@ -54,6 +54,7 @@
             name = "gitleaks";
             entry = self.lib.writeShellScript "gitleaks" "gitleaks protect --verbose --redact --staged";
           };
+
           markdownlint = {
             enable = true;
             settings.configuration = {
