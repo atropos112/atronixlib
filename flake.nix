@@ -20,7 +20,7 @@
         cd $DEVENV_ROOT
         ${script}
         cd $ORIGINAL_DIR
-      ''}";
+      ''} \"$@\" ";
 
       listScripts = scripts: "${pkgs.writeShellScript "help" ''
         echo
