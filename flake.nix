@@ -32,6 +32,17 @@
         echo
       ''}";
 
+      # This needs to be sourced, otherwise the eval of exports won't work.
+      infisicalEnvLoad = path: "${pkgs.writeShellScript "infisical-env-load" ''
+        if [ -n "$ATRO_INFISICAL_TOKEN_PATH" ] && [ -n "$ATRO_INFISICAL_PROJECT_ID_PATH" ]; then
+            TOKEN=$(cat "$ATRO_INFISICAL_TOKEN_PATH")
+            PROJECT_ID=$(cat "$ATRO_INFISICAL_PROJECT_ID_PATH")
+            eval "$(infisical export --format=dotenv-export --token="$TOKEN" --projectId="$PROJECT_ID" --env=local --path="${path}" --silent --telemetry=false)"
+        else
+            echo "Infisical token or projectId not found. Skipping Infisical environment load."
+        fi
+      ''}";
+
       goTest = self.lib.writeShellScript "go-test" ''
         ${pkgs.gotestsum}/bin/gotestsum --  ./... -race -coverprofile=coverage.out -covermode=atomic
       '';
